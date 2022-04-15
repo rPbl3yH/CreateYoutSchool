@@ -13,6 +13,7 @@ public class BuildingSystem : MonoBehaviour
     Grid _grid;
 
     public GameObject CurrentPrefab;
+    public Building CurrentBuilding;
     
     private PlacebleObject _objToPlace;
     private byte _currentIdFloor;
@@ -41,10 +42,11 @@ public class BuildingSystem : MonoBehaviour
 
     #region Utils
 
-    public void InitializePlacements(Vector3 position)
+    public void InitializePlacements(Vector3 position, Building building)
     {
         ClearPlacement();
-        CreatePlacements(GetPositionsForPlacement(position));
+        SetCurrentBuilding(building);
+        CreatePlacements(GetPositionsForPlacement(position, building.IdFloor));
     }
     private Vector3 SnapGridPosition(Vector3 worldPosition)
     {
@@ -54,28 +56,28 @@ public class BuildingSystem : MonoBehaviour
         return worldPosition;
     }
 
-    private Vector3[] GetPositionsForPlacement(Vector3 pos)
+    private Vector3[] GetPositionsForPlacement(Vector3 pos, byte idFloor)
     {
         byte sizeCanTile = 5;
 
         Vector3[] array = new Vector3[sizeCanTile];
-        array[0] = GetCheckPositionForPlacement(pos, Vector3.forward);
-        array[1] = GetCheckPositionForPlacement(pos, Vector3.right);
-        array[2] = GetCheckPositionForPlacement(pos, Vector3.back);
-        array[3] = GetCheckPositionForPlacement(pos, Vector3.left);
-        array[4] = GetCheckPositionForPlacement(pos, Vector3.zero);
+        array[0] = CheckPositionForPlacement(pos, Vector3.forward, idFloor);
+        array[1] = CheckPositionForPlacement(pos, Vector3.right, idFloor);
+        array[2] = CheckPositionForPlacement(pos, Vector3.back, idFloor);
+        array[3] = CheckPositionForPlacement(pos, Vector3.left, idFloor);
+        array[4] = CheckPositionForPlacement(pos, Vector3.zero, idFloor);
         
         return array;
     }
 
-    private Vector3 GetCheckPositionForPlacement(Vector3 pos, Vector3 offsetVector)
+    private Vector3 CheckPositionForPlacement(Vector3 pos, Vector3 offsetVector, byte idFloor)
     {
         Vector3 otherTilePos = pos + offsetVector;
         Vector3Int otherCellPos = Gridlayout.WorldToCell(otherTilePos);
         if (offsetVector == Vector3.zero)
             return otherTilePos;
         
-        if (_tilemapsFloors[_currentIdFloor].GetTile(otherCellPos) == whiteTile)
+        if (_tilemapsFloors[idFloor].GetTile(otherCellPos) == whiteTile)
             return _falseVector;
 
         return otherTilePos;
@@ -87,7 +89,6 @@ public class BuildingSystem : MonoBehaviour
         for (var index = 0; index < lastIdVec; index++)
         {
             var pos = positions[index];
-            Debug.Log(pos);
             if (pos == _falseVector)
                 continue;
 
@@ -107,9 +108,10 @@ public class BuildingSystem : MonoBehaviour
         Vector3 position = SnapGridPosition(spawnPos) + GetOffsetFloor(idFloor);
         
         GameObject obj = Instantiate(prefab, position, Quaternion.identity);
+        obj.GetComponent<Building>().IdFloor = idFloor;
         _currentIdFloor = idFloor;
-        
-        _tilemapsFloors[_currentIdFloor].SetTile(Gridlayout.WorldToCell(spawnPos), whiteTile);
+        var curTilemap = _tilemapsFloors[idFloor];
+        curTilemap.SetTile(curTilemap.WorldToCell(spawnPos), whiteTile);
         ClearPlacement();
     }
 
@@ -120,7 +122,7 @@ public class BuildingSystem : MonoBehaviour
 
     private void InizialatePlacement(Vector3 pos, bool isNextLevel)
     {
-        var currentIdDFloor = _currentIdFloor;
+        var currentIdDFloor = CurrentBuilding.IdFloor;
         if (isNextLevel)
         {
             if (currentIdDFloor + 1 < _tilemapsFloors.Length)
@@ -132,8 +134,7 @@ public class BuildingSystem : MonoBehaviour
         GameObject obj = Instantiate(_placement, position, Quaternion.identity);
         obj.GetComponent<Placement>().IdFloor = currentIdDFloor;
         
-        if(obj.GetComponent<Placement>())
-            _currentPlacements.Add(obj.GetComponent<Placement>());
+        _currentPlacements.Add(obj.GetComponent<Placement>());
     }
 
     private void ClearPlacement()
@@ -144,6 +145,29 @@ public class BuildingSystem : MonoBehaviour
         }
         _currentPlacements.Clear();
     }
+
+    public void ClearCurrentBuilding()
+    {
+        if(CurrentBuilding)
+            DisactiveCurrentBuilding(CurrentBuilding);
+        CurrentBuilding = null;
+    }
+    
+    private void SetCurrentBuilding(Building building)
+    {
+        Debug.Log($"SetCurrent");
+        if (CurrentBuilding)
+        {
+            DisactiveCurrentBuilding(CurrentBuilding);
+        }
+        CurrentBuilding = building;
+    }
+
+    private void DisactiveCurrentBuilding(Building building)
+    {
+        building.GetComponent<Renderer>().material.color = Color.white;
+    }
+    
     #endregion
 
 }

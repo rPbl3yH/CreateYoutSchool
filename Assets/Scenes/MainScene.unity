@@ -589,11 +589,9 @@ MonoBehaviour:
   - {fileID: 954746491}
   - {fileID: 1552422042}
   - {fileID: 1622531781}
-  _firstFloorTilemap: {fileID: 954746491}
-  _secondFloorTlemap: {fileID: 1552422042}
   Gridlayout: {fileID: 1250255503}
   CurrentPrefab: {fileID: 0}
-  offset: {x: 0, y: 0, z: 0}
+  CurrentBuilding: {fileID: 0}
   whiteTile: {fileID: 11400000, guid: ab9b464992e12484b871d4b0c3a7c77a, type: 2}
   blueTile: {fileID: 11400000, guid: 80471c4c7de7a4ab9934648acee0b688, type: 2}
   _placement: {fileID: 5304972868329386262, guid: 5600303925dbd4f1388e054f49a13fc6, type: 3}
@@ -904,7 +902,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1622531780}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 1, z: 0}
+  m_LocalPosition: {x: 0, y: 2, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 1250255504}
