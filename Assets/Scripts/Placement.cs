@@ -8,16 +8,6 @@ public abstract class Placement : PlacebleObject
 
     public override void OnPointerClick(PointerEventData eventData)
     {
-        base.OnPointerClick(eventData);
         CurrentPrefab = BuildSystem.CurrentPrefab;
     }
-
-    // public virtual void OnMouseDown()
-    // {
-    //     CurrentPrefab = BuildSystem.CurrentPrefab;
-    //     BuildSystem.InizializeGameObject(CurrentPrefab, gameObject.transform.position, IdFloor);
-    //     Destroy(gameObject);
-    // }
-    
-    
 }

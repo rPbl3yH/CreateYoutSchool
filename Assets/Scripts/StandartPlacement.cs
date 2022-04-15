@@ -8,7 +8,7 @@ public class StandartPlacement : Placement
     public override void OnPointerClick(PointerEventData eventData)
     {
         base.OnPointerClick(eventData);
-        BuildSystem.InizializeGameObject(CurrentPrefab, gameObject.transform.position, IdFloor);
+        BuildSystem.InizialateGameObject(CurrentPrefab, gameObject.transform.position, IdFloor);
         Destroy(gameObject);
     }
 }

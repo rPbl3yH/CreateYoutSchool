@@ -1,10 +1,6 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Serialization;
 using UnityEngine.Tilemaps;
-using UnityEngine.UIElements;
 
 public class BuildingSystem : MonoBehaviour
 {
@@ -13,18 +9,15 @@ public class BuildingSystem : MonoBehaviour
     [SerializeField] GameObject _mainPrefab;
 
     [SerializeField] private Tilemap[] _tilemapsFloors;
-    [SerializeField] private Tilemap _firstFloorTilemap;
-    [SerializeField] private Tilemap _secondFloorTlemap;
-
     [SerializeField] GridLayout Gridlayout;
     Grid _grid;
 
     public GameObject CurrentPrefab;
-    [SerializeField] Vector3 offset;
-
+    
     private PlacebleObject _objToPlace;
-    private byte _currentIdFloor = 0;
+    private byte _currentIdFloor;
     private Vector3 _falseVector = new Vector3(0,-1,0);
+    private List<Placement> _currentPlacements = new List<Placement>();
     [SerializeField] TileBase whiteTile;
     [SerializeField] TileBase blueTile;
     [SerializeField] GameObject _placement;
@@ -42,12 +35,17 @@ public class BuildingSystem : MonoBehaviour
     private void Start()
     {
         Instantiate(_placement, transform.position, Quaternion.identity);
-        //Instantiate(_placement)
     }
 
     #endregion
 
     #region Utils
+
+    public void InitializePlacements(Vector3 position)
+    {
+        ClearPlacement();
+        CreatePlacements(GetPositionsForPlacement(position));
+    }
     private Vector3 SnapGridPosition(Vector3 worldPosition)
     {
         Vector3Int cellPos = Gridlayout.WorldToCell(worldPosition);
@@ -56,21 +54,21 @@ public class BuildingSystem : MonoBehaviour
         return worldPosition;
     }
 
-    private Vector3[] GetPositionsForBuilding(Vector3 pos)
+    private Vector3[] GetPositionsForPlacement(Vector3 pos)
     {
         byte sizeCanTile = 5;
 
         Vector3[] array = new Vector3[sizeCanTile];
-        array[0] = GetCheckPositionForBuilding(pos, Vector3.forward);
-        array[1] = GetCheckPositionForBuilding(pos, Vector3.right);
-        array[2] = GetCheckPositionForBuilding(pos, Vector3.back);
-        array[3] = GetCheckPositionForBuilding(pos, Vector3.left);
-        array[4] = GetCheckPositionForBuilding(pos, Vector3.zero);
+        array[0] = GetCheckPositionForPlacement(pos, Vector3.forward);
+        array[1] = GetCheckPositionForPlacement(pos, Vector3.right);
+        array[2] = GetCheckPositionForPlacement(pos, Vector3.back);
+        array[3] = GetCheckPositionForPlacement(pos, Vector3.left);
+        array[4] = GetCheckPositionForPlacement(pos, Vector3.zero);
         
         return array;
     }
 
-    private Vector3 GetCheckPositionForBuilding(Vector3 pos, Vector3 offsetVector)
+    private Vector3 GetCheckPositionForPlacement(Vector3 pos, Vector3 offsetVector)
     {
         Vector3 otherTilePos = pos + offsetVector;
         Vector3Int otherCellPos = Gridlayout.WorldToCell(otherTilePos);
@@ -82,12 +80,29 @@ public class BuildingSystem : MonoBehaviour
 
         return otherTilePos;
     }
+    
+    private void CreatePlacements(Vector3[] positions)
+    {
+        var lastIdVec = positions.Length - 1;
+        for (var index = 0; index < lastIdVec; index++)
+        {
+            var pos = positions[index];
+            Debug.Log(pos);
+            if (pos == _falseVector)
+                continue;
+
+            InizialatePlacement(pos, false);
+        }
+        if(positions[lastIdVec] != _falseVector)
+            InizialatePlacement(positions[lastIdVec], true);
+        
+    }
 
     #endregion
 
     #region Building System
 
-    public void InizializeGameObject(GameObject prefab, Vector3 spawnPos, byte idFloor)
+    public void InizialateGameObject(GameObject prefab, Vector3 spawnPos, byte idFloor)
     {
         Vector3 position = SnapGridPosition(spawnPos) + GetOffsetFloor(idFloor);
         
@@ -95,8 +110,7 @@ public class BuildingSystem : MonoBehaviour
         _currentIdFloor = idFloor;
         
         _tilemapsFloors[_currentIdFloor].SetTile(Gridlayout.WorldToCell(spawnPos), whiteTile);
-        
-        DrawCanTileForBuilding(GetPositionsForBuilding(position));
+        ClearPlacement();
     }
 
     private Vector3 GetOffsetFloor(byte idFloor)
@@ -104,7 +118,7 @@ public class BuildingSystem : MonoBehaviour
         return Vector3.up * idFloor;
     }
 
-    void InizializePlacement(Vector3 pos, bool isNextLevel)
+    private void InizialatePlacement(Vector3 pos, bool isNextLevel)
     {
         var currentIdDFloor = _currentIdFloor;
         if (isNextLevel)
@@ -117,25 +131,19 @@ public class BuildingSystem : MonoBehaviour
         
         GameObject obj = Instantiate(_placement, position, Quaternion.identity);
         obj.GetComponent<Placement>().IdFloor = currentIdDFloor;
-    }
-
-    public void DrawCanTileForBuilding(Vector3[] positions)
-    {
-        var lastIdVec = positions.Length - 1;
-        for (var index = 0; index < lastIdVec; index++)
-        {
-            var pos = positions[index];
-            Debug.Log(pos);
-            if (pos == _falseVector)
-                continue;
-
-            InizializePlacement(pos, false);
-        }
-        if(positions[lastIdVec] != _falseVector)
-            InizializePlacement(positions[lastIdVec], true);
         
+        if(obj.GetComponent<Placement>())
+            _currentPlacements.Add(obj.GetComponent<Placement>());
     }
 
+    private void ClearPlacement()
+    {
+        foreach (var placement in _currentPlacements)
+        {
+            Destroy(placement.gameObject);
+        }
+        _currentPlacements.Clear();
+    }
     #endregion
 
 }
