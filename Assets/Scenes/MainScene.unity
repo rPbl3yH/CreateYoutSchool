@@ -568,6 +568,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _mainPrefab: {fileID: 4554736530624499143, guid: 3c64b37df55b44ec2bdab032e392f252, type: 3}
+  _tilemapsFloors:
+  - {fileID: 954746491}
+  - {fileID: 1552422042}
   _firstFloorTilemap: {fileID: 954746491}
   _secondFloorTlemap: {fileID: 1552422042}
   Gridlayout: {fileID: 1250255503}

@@ -1,19 +1,23 @@
 using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.Tilemaps;
 
-public class Placement : MonoBehaviour
+public abstract class Placement : PlacebleObject
 {
-    private BuildingSystem _buildtngSystem;
-    private GameObject _currentPrefab;
-    public byte IdFloor;
-    private void Start()
+    protected GameObject CurrentPrefab;
+
+    public override void OnPointerClick(PointerEventData eventData)
     {
-        _buildtngSystem = BuildingSystem.Current;
+        base.OnPointerClick(eventData);
+        CurrentPrefab = BuildSystem.CurrentPrefab;
     }
+
+    // public virtual void OnMouseDown()
+    // {
+    //     CurrentPrefab = BuildSystem.CurrentPrefab;
+    //     BuildSystem.InizializeGameObject(CurrentPrefab, gameObject.transform.position, IdFloor);
+    //     Destroy(gameObject);
+    // }
     
-    private void OnMouseDown()
-    {
-        _currentPrefab = _buildtngSystem.CurrentPrefab;
-        _buildtngSystem.InizializeGameObject(_currentPrefab, gameObject.transform.position, IdFloor);
-        Destroy(gameObject);
-    }
+    
 }
