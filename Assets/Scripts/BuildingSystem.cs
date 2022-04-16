@@ -42,6 +42,8 @@ public class BuildingSystem : MonoBehaviour
 
     #region Utils
 
+    public void SetCurrentPrefab(GameObject value) => CurrentPrefab = value;
+
     public void InitializePlacements(Vector3 position, Building building)
     {
         ClearPlacement();
