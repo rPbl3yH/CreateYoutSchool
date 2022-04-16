@@ -116,17 +116,19 @@ public class BuildingSystem : MonoBehaviour
     private void CreatePlacements(Vector3[] positions)
     {
         var lastIdVec = positions.Length - 1;
-        for (var index = 0; index < lastIdVec; index++)
+        bool isNextLevel = false;
+        for (var index = 0; index <= lastIdVec; index++)
         {
             var pos = positions[index];
+
             if (pos == _falseVector)
                 continue;
 
-            InizialatePlacement(pos, false);
+            if (index == lastIdVec)
+                isNextLevel = true;
+
+            InizialatePlacement(pos, isNextLevel);
         }
-        if(positions[lastIdVec] != _falseVector)
-            InizialatePlacement(positions[lastIdVec], true);
-        
     }
 
     #endregion
@@ -139,8 +141,12 @@ public class BuildingSystem : MonoBehaviour
         
         GameObject obj = Instantiate(prefab, position, Quaternion.identity);
         obj.GetComponent<Building>().IdFloor = idFloor;
+        
         var curTilemap = _tilemapsFloors[idFloor];
         curTilemap.SetTile(curTilemap.WorldToCell(spawnPos), whiteTile);
+        
+        if(obj.GetComponent<SchoolBuilding>())
+            obj.GetComponent<SchoolBuilding>().Initialize((byte)Random.Range(0,10), (byte)Random.Range(0,10));
         ClearPlacement();
     }
 
