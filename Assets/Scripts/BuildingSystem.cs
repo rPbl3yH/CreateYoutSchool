@@ -16,13 +16,12 @@ public class BuildingSystem : MonoBehaviour
     public Building CurrentBuilding;
     
     private PlacebleObject _objToPlace;
-    private byte _currentIdFloor;
+     
     private Vector3 _falseVector = new Vector3(0,-1,0);
     private List<Placement> _currentPlacements = new List<Placement>();
     [SerializeField] TileBase whiteTile;
     [SerializeField] TileBase blueTile;
     [SerializeField] GameObject _placement;
-
     
     #region UnityMethods
 
@@ -42,12 +41,7 @@ public class BuildingSystem : MonoBehaviour
 
     #region Utils
 
-    public void InitializePlacements(Vector3 position, Building building)
-    {
-        ClearPlacement();
-        SetCurrentBuilding(building);
-        CreatePlacements(GetPositionsForPlacement(position, building.IdFloor));
-    }
+    
     private Vector3 SnapGridPosition(Vector3 worldPosition)
     {
         Vector3Int cellPos = Gridlayout.WorldToCell(worldPosition);
@@ -71,16 +65,52 @@ public class BuildingSystem : MonoBehaviour
     }
 
     private Vector3 CheckPositionForPlacement(Vector3 pos, Vector3 offsetVector, byte idFloor)
-    {
+    { 
         Vector3 otherTilePos = pos + offsetVector;
-        Vector3Int otherCellPos = Gridlayout.WorldToCell(otherTilePos);
-        if (offsetVector == Vector3.zero)
-            return otherTilePos;
+        Vector3Int otherCellPos = _tilemapsFloors[idFloor].WorldToCell(otherTilePos);
+        //Проеврка на наличие здание под выбранным
         
-        if (_tilemapsFloors[idFloor].GetTile(otherCellPos) == whiteTile)
+        if (idFloor - 1 >= 0)
+        {
+            byte idFloorUnderBuilding = (byte) (idFloor - 1);
+            if (!IsHaveBuildingUnderPlacement(otherCellPos, idFloorUnderBuilding))
+            {
+                return _falseVector;
+            }
+                
+        }
+
+        //Проверка на этаже выше
+        if (offsetVector == Vector3.zero && idFloor + 1 < _tilemapsFloors.Length)
+            idFloor++;
+        
+        //Проверка на наличие другого здания
+        if (IsHaveBuilding(otherCellPos, idFloor))
             return _falseVector;
 
         return otherTilePos;
+    }
+
+    private bool IsHaveBuildingUnderPlacement(Vector3Int otherCellPos, byte idUnderFloor)
+    {
+        for (int x = -1; x <= 1; x++)
+        {
+            for (int z = -1; z <= 1; z++)
+            {
+                //Z пишу в Y, так как GRID имеет направление XZY
+                Vector3Int otherUnderCellPos = otherCellPos + new Vector3Int(x, z, 0);
+                if (IsHaveBuilding(otherUnderCellPos,idUnderFloor))
+                {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private bool IsHaveBuilding(Vector3Int pos, byte idFloor)
+    {
+        return _tilemapsFloors[idFloor].GetTile(pos) == whiteTile;
     }
     
     private void CreatePlacements(Vector3[] positions)
@@ -109,7 +139,6 @@ public class BuildingSystem : MonoBehaviour
         
         GameObject obj = Instantiate(prefab, position, Quaternion.identity);
         obj.GetComponent<Building>().IdFloor = idFloor;
-        _currentIdFloor = idFloor;
         var curTilemap = _tilemapsFloors[idFloor];
         curTilemap.SetTile(curTilemap.WorldToCell(spawnPos), whiteTile);
         ClearPlacement();
@@ -120,6 +149,13 @@ public class BuildingSystem : MonoBehaviour
         return Vector3.up * idFloor;
     }
 
+    public void InitializePlacements(Vector3 position, Building building)
+    {
+        ClearPlacement();
+        SetCurrentBuilding(building);
+        CreatePlacements(GetPositionsForPlacement(position, building.IdFloor));
+    }
+    
     private void InizialatePlacement(Vector3 pos, bool isNextLevel)
     {
         var currentIdDFloor = CurrentBuilding.IdFloor;
@@ -155,7 +191,6 @@ public class BuildingSystem : MonoBehaviour
     
     private void SetCurrentBuilding(Building building)
     {
-        Debug.Log($"SetCurrent");
         if (CurrentBuilding)
         {
             DisactiveCurrentBuilding(CurrentBuilding);
