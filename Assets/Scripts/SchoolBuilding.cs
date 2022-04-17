@@ -1,8 +1,8 @@
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 public class SchoolBuilding : Building
 {
-    public PointsBarController PointsController;
     public void Initialize(byte sciencePoint, byte physicalPoint)
     {
         _sciencePoints = sciencePoint;
@@ -13,4 +13,9 @@ public class SchoolBuilding : Building
     private byte _sciencePoints;
     private byte _physicalPoints;
 
+    public override void OnPointerClick(PointerEventData eventData)
+    {
+        base.OnPointerClick(eventData);
+        EventManager.OnBuildingSelected(_sciencePoints, _physicalPoints);
+    }
 }

@@ -8,5 +8,8 @@ public abstract class Building : PlacebleObject
     {
         BuildSystem.InitializePlacements(transform.position,  gameObject.GetComponent<Building>());
         gameObject.GetComponent<Renderer>().material.color = Color.magenta;
+        
     }
+    
+    
 }
