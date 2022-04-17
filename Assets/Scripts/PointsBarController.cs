@@ -6,29 +6,20 @@ using UnityEngine.UI;
 
 public class PointsBarController : MonoBehaviour
 {
-    public static PointsBarController Current;
-    
     [SerializeField] private Text _textSciencePoints;
     [SerializeField] private Text _textPhysicalPoints;
 
-    public event Action<byte, byte> UpdatePointsBar;
-
-    public byte SciencePoints;
-    public byte PhysicalPoints;
-
+    [SerializeField] private string _template;
+    
     #region UnityMethods
-
-    private void Awake()
-    {
-        Current = GetComponent<PointsBarController>();
-    }
-
-    private void Update()
-    {
-        _textPhysicalPoints.text = "Physical - " + PhysicalPoints;
-        _textSciencePoints.text = "Science - " + SciencePoints;
-    }
+    
 
     #endregion
+
+    public void SetPoint(byte sciencePoint, byte physicalPoint)
+    {
+        _textSciencePoints.text = string.Format(_template, "Science", sciencePoint);
+        _textPhysicalPoints.text = string.Format(_template, "Physical", physicalPoint);
+    }
     
 }

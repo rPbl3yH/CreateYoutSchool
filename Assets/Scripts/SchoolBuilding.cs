@@ -7,17 +7,10 @@ public class SchoolBuilding : Building
     {
         _sciencePoints = sciencePoint;
         _physicalPoints = physicalPoint;
-        PointsController = PointsBarController.Current;
-        
-        SendToController();
+
     }
     
     private byte _sciencePoints;
     private byte _physicalPoints;
 
-    private void SendToController()
-    {
-        PointsController.PhysicalPoints += _physicalPoints;
-        PointsController.SciencePoints += _sciencePoints;
-    }
 }

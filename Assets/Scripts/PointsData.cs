@@ -9,8 +9,6 @@ public class PointsData : MonoBehaviour
     
     public byte SciencePoints;
     public byte PhysicalPoints;
-    
-    
 
     private void Start()
     {

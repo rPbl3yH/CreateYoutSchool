@@ -40,19 +40,9 @@ public class BuildingSystem : MonoBehaviour
     #endregion
 
     #region Utils
-
-<<<<<<< HEAD
-    
-=======
     public void SetCurrentPrefab(GameObject value) => CurrentPrefab = value;
 
-    public void InitializePlacements(Vector3 position, Building building)
-    {
-        ClearPlacement();
-        SetCurrentBuilding(building);
-        CreatePlacements(GetPositionsForPlacement(position, building.IdFloor));
-    }
->>>>>>> 3f2ad2aa977eca8103ce89fca9565611f537cb3f
+    
     private Vector3 SnapGridPosition(Vector3 worldPosition)
     {
         Vector3Int cellPos = Gridlayout.WorldToCell(worldPosition);
@@ -155,9 +145,14 @@ public class BuildingSystem : MonoBehaviour
         
         var curTilemap = _tilemapsFloors[idFloor];
         curTilemap.SetTile(curTilemap.WorldToCell(spawnPos), whiteTile);
+
+        byte sciencePoint = (byte) Random.Range(0, 10);
+        byte physicalPoint = (byte) Random.Range(0, 10);
         
-        if(obj.GetComponent<SchoolBuilding>())
-            obj.GetComponent<SchoolBuilding>().Initialize((byte)Random.Range(0,10), (byte)Random.Range(0,10));
+        if(obj.TryGetComponent(out SchoolBuilding schoolBuilding))
+            schoolBuilding.Initialize(sciencePoint, physicalPoint);
+        
+        EventManager.OnBuidingCreated(sciencePoint, physicalPoint);
         ClearPlacement();
     }
 
@@ -165,7 +160,7 @@ public class BuildingSystem : MonoBehaviour
     {
         return Vector3.up * idFloor;
     }
-
+    
     public void InitializePlacements(Vector3 position, Building building)
     {
         ClearPlacement();
