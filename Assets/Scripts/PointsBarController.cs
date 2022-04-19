@@ -24,11 +24,21 @@ public class PointsBarController : MonoBehaviour
         _textSciencePoints.text = string.Format(_template, "Science", sciencePoint);
         _textPhysicalPoints.text = string.Format(_template, "Physical", physicalPoint);
     }
+    public void SetPoints(ref SchoolPoints schoolPoints)
+    {
+        _textSciencePoints.text = string.Format(_template, "Science", schoolPoints.Science);
+        _textPhysicalPoints.text = string.Format(_template, "Physical", schoolPoints.Physical);
+    }
 
     public void SetCurrentPoints(byte sciencePointValue, byte physicalPointValue)
     {
         _currentTextSciencePoints.text = string.Format(_template, "Science", sciencePointValue);
         _currentTextPhysicalPoints.text = string.Format(_template, "Physical", physicalPointValue);
+    }
+    public void SetCurrentPoints(ref SchoolPoints schoolPoints)
+    {
+        _currentTextSciencePoints.text = string.Format(_template, "Science", schoolPoints.Science);
+        _currentTextPhysicalPoints.text = string.Format(_template, "Physical", schoolPoints.Physical);
     }
 
     public void SetActiveCurrentTexts(bool IsActive)

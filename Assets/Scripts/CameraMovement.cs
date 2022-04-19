@@ -11,10 +11,11 @@ public class CameraMovement : MonoBehaviour
     
     [SerializeField] private float _sensitive = 3;
     [SerializeField] private float _limitY = 60;
-
+    
+    [Header("Zoom Setting")]
     [SerializeField] private float _zoomMax;
     [SerializeField] private float _zoomMin;
-    [SerializeField] private float _zoom;
+    [SerializeField] private float _zoomSensitive;
     
     private float _x, _y;
     
@@ -33,8 +34,8 @@ public class CameraMovement : MonoBehaviour
             if (_touch.phase == TouchPhase.Moved)
             {
                 float deltaY = _touch.deltaPosition.y;
-                if(deltaY > 0) _offset.z += _zoom;
-                else if(deltaY < 0) _offset.z -= _zoom;
+                if(deltaY > 0) _offset.z += _zoomSensitive;
+                else if(deltaY < 0) _offset.z -= _zoomSensitive;
                 
                 _offset.z = Mathf.Clamp(_offset.z, -Mathf.Abs(_zoomMax), -Mathf.Abs(_zoomMin));
                 

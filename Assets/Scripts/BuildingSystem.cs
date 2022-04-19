@@ -145,14 +145,22 @@ public class BuildingSystem : MonoBehaviour
         
         var curTilemap = _tilemapsFloors[idFloor];
         curTilemap.SetTile(curTilemap.WorldToCell(spawnPos), whiteTile);
-
-        byte sciencePoint = (byte) Random.Range(0, 10);
-        byte physicalPoint = (byte) Random.Range(0, 10);
         
-        if(obj.TryGetComponent(out SchoolBuilding schoolBuilding))
-            schoolBuilding.Initialize(sciencePoint, physicalPoint);
         
-        EventManager.OnBuidingCreated(sciencePoint, physicalPoint);
+        if (obj.TryGetComponent(out SchoolBuilding schoolBuilding))
+        {
+            SchoolPoints schoolPoints;
+            schoolPoints.Musical = Random.Range(0, 10);
+            schoolPoints.Physical = Random.Range(0, 10);
+            schoolPoints.Science = Random.Range(0, 10);
+            
+            schoolBuilding.InitializePoints(ref schoolPoints);
+            
+            EventManager.OnBuidingCreated(ref schoolPoints);
+        }
+            
+        
+       
         ClearPlacement();
     }
 
