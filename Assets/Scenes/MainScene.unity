@@ -870,12 +870,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _target: {fileID: 1431545235}
-  _offset: {x: 0, y: 0, z: 0}
+  _offset: {x: 7.5, y: 6.2, z: 6.8}
   _sensitive: 5
   _limitY: 60
-  _zoom: 0.25
-  _zoomMax: 10
-  _zoomMin: 3
 --- !u!114 &963194231
 MonoBehaviour:
   m_ObjectHideFlags: 0
