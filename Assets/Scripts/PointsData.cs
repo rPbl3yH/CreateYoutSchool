@@ -1,58 +1,48 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Random = UnityEngine.Random;
 
+public enum TypePoints
+{
+    Science,
+    Physical,
+    Musical
+}
 public class PointsData : MonoBehaviour
 {
     [SerializeField] PointsBarController _pointsBarController;
 
+    private Dictionary<TypePoints, int> dicPoints;
+    
     private SchoolPoints _schoolPoints;
     private SchoolPoints _currentSchoolPoints;
-    public int CurrentSciencePoints;
-    public int CurrentPhysicalPoints;
-    
-    public byte SciencePoints;
-    public byte PhysicalPoints;
 
     private void Start()
     {
-        EventManager.BuildingPointsCreated += OnBuildingCreated;
-        EventManager.BuildingPointsSelected += OnBuildingSelected;
-    }
-
-    public void OnBuildingCreated(byte sciencePointValue, byte physicalPointValue)
-    {
-        SciencePoints += sciencePointValue;
-        PhysicalPoints += physicalPointValue;
+        _schoolPoints.Initialize();
+        _currentSchoolPoints.Initialize();
         
-        _pointsBarController.SetPoints(SciencePoints, PhysicalPoints);
-        _pointsBarController.SetActiveCurrentTexts(false);
+        EventManager.BuildingCreated += OnBuildingCreated;
+        EventManager.BuildingSelected += OnBuildingSelected;
     }
-    public void OnBuildingCreated(SchoolPoints schoolPoints)
+    
+    public void OnBuildingCreated(ref SchoolPoints schoolPoints)
     {
-        
-        //_schoolPoints = schoolPoints;
-        _schoolPoints.Science += schoolPoints.Science;
-        _schoolPoints.Physical += schoolPoints.Science;
+        foreach (var pair in schoolPoints.Points)
+        {
+            _schoolPoints.Points[pair.Key] += pair.Value;
+        }
 
         _pointsBarController.SetPoints(ref _schoolPoints);
         _pointsBarController.SetActiveCurrentTexts(false);
     }
-
-    public void OnBuildingSelected(byte sciencePointValue, byte physicalPointValue)
+    
+    public void OnBuildingSelected(ref SchoolPoints schoolPoints)
     {
-        CurrentSciencePoints = sciencePointValue;
-        CurrentPhysicalPoints = physicalPointValue;
-        
-        _pointsBarController.SetActiveCurrentTexts(true);
-        _pointsBarController.SetCurrentPoints(ref _schoolPoints);
-    }
-    public void OnBuildingSelected(SchoolPoints schoolPoints)
-    {
-        _currentSchoolPoints.Science = schoolPoints.Science;
-        _currentSchoolPoints.Physical = schoolPoints.Physical;
+        Debug.Log(schoolPoints.Points);
+        foreach (var pair in schoolPoints.Points)
+        {
+            _currentSchoolPoints.Points[pair.Key] = pair.Value;
+        }
         
         _pointsBarController.SetActiveCurrentTexts(true);
         _pointsBarController.SetCurrentPoints(ref _currentSchoolPoints);

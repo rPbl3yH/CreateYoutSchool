@@ -1,50 +1,46 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class PointsBarController : MonoBehaviour
 {
-    [SerializeField] private Text _textSciencePoints;
-    [SerializeField] private Text _textPhysicalPoints;
+    [SerializeField] private Text[] _textPoins;
+    [SerializeField] private Text[] _currentTextPoins;
     
-    [SerializeField] private Text _currentTextSciencePoints;
-    [SerializeField] private Text _currentTextPhysicalPoints;
-
     [SerializeField] private string _template;
     
     #region UnityMethods
     
+    #endregion
+
+    #region SetValues
+
+    public void SetPoints(ref SchoolPoints schoolPoints)
+    {
+        if (schoolPoints.Points.Count > _textPoins.Length)
+            throw new ArgumentException("Типов поинтов больше, чем текстов");
+        
+        foreach (var pair in schoolPoints.Points)
+            _textPoins[(int) pair.Key].text = string.Format(_template, pair.Key, pair.Value);
+    }
+    
+    public void SetCurrentPoints(ref SchoolPoints schoolPoints)
+    {
+        if (schoolPoints.Points.Count > _textPoins.Length)
+            throw new ArgumentException("Типов поинтов больше, чем текущих текстов");
+        
+        foreach (var pair in schoolPoints.Points)
+            _currentTextPoins[(int) pair.Key].text = string.Format(_template, pair.Key, pair.Value);
+    }
 
     #endregion
 
-    public void SetPoints(byte sciencePoint, byte physicalPoint)
+    #region Texts
+
+    public void SetActiveCurrentTexts(bool isActive)
     {
-        _textSciencePoints.text = string.Format(_template, "Science", sciencePoint);
-        _textPhysicalPoints.text = string.Format(_template, "Physical", physicalPoint);
-    }
-    public void SetPoints(ref SchoolPoints schoolPoints)
-    {
-        _textSciencePoints.text = string.Format(_template, "Science", schoolPoints.Science);
-        _textPhysicalPoints.text = string.Format(_template, "Physical", schoolPoints.Physical);
+        foreach (var text in _currentTextPoins) text.gameObject.SetActive(isActive);
     }
 
-    public void SetCurrentPoints(byte sciencePointValue, byte physicalPointValue)
-    {
-        _currentTextSciencePoints.text = string.Format(_template, "Science", sciencePointValue);
-        _currentTextPhysicalPoints.text = string.Format(_template, "Physical", physicalPointValue);
-    }
-    public void SetCurrentPoints(ref SchoolPoints schoolPoints)
-    {
-        _currentTextSciencePoints.text = string.Format(_template, "Science", schoolPoints.Science);
-        _currentTextPhysicalPoints.text = string.Format(_template, "Physical", schoolPoints.Physical);
-    }
-
-    public void SetActiveCurrentTexts(bool IsActive)
-    {
-        _currentTextSciencePoints.gameObject.SetActive(IsActive);
-        _currentTextPhysicalPoints.gameObject.SetActive(IsActive);
-    }
-    
+    #endregion
 }

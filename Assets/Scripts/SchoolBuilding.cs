@@ -1,33 +1,27 @@
+using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
 public class SchoolBuilding : Building
 {
-    public void Initialize(byte sciencePoint, byte physicalPoint)
+    private SchoolPoints _schoolPoints;
+
+    public override void Start()
     {
-        SchoolPoints.Musical = 0;
+        base.Start();
         
-        _sciencePoints = sciencePoint;
-        _physicalPoints = physicalPoint;
-
+        Debug.Log(_schoolPoints.Points);
     }
 
-    public void InitializePoints(ref SchoolPoints schoolPoints)
+    public void Initialize(ref SchoolPoints schoolPoints)
     {
-        SchoolPoints = schoolPoints;
-        Debug.Log(SchoolPoints.Musical);
-        Debug.Log(SchoolPoints.Physical);
-        Debug.Log(SchoolPoints.Science);
+        _schoolPoints = schoolPoints;
+        _schoolPoints.PrintInfo();
     }
-
-    protected SchoolPoints SchoolPoints;
-    
-    private byte _sciencePoints;
-    private byte _physicalPoints;
 
     public override void OnPointerClick(PointerEventData eventData)
     {
         base.OnPointerClick(eventData);
-        EventManager.OnBuildingSelected(ref SchoolPoints);
+        EventManager.OnBuildingSelected(ref _schoolPoints);
     }
 }

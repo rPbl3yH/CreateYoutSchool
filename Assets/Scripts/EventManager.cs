@@ -1,35 +1,21 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class EventManager : MonoBehaviour
 {
-    public static Action<byte, byte> BuildingSelected;
-    public static Action<byte, byte> BuildingCreated;
-
-    public static Action<SchoolPoints> BuildingPointsSelected;
-    public static Action<SchoolPoints> BuildingPointsCreated;
-
-    public static void OnBuidingCreated(byte SciencePoint, byte PhysicalPoint)
-    {
-        BuildingCreated?.Invoke(SciencePoint, PhysicalPoint);
-        
-    }
+    public static BuildingDelegateSelected BuildingSelected;
+    public static BuildingDelegateCreated BuildingCreated;
+    public delegate void BuildingDelegateSelected(ref SchoolPoints schoolPoints);
+    public delegate void BuildingDelegateCreated(ref SchoolPoints schoolPoints);
     
     public static void OnBuidingCreated(ref SchoolPoints schoolPoints)
     {
-        BuildingPointsCreated?.Invoke(schoolPoints);
-        
+        BuildingCreated?.Invoke(ref schoolPoints);
     }
 
-    public static void OnBuildingSelected(byte SciencePoint, byte PhysicalPoint)
-    {
-        BuildingSelected?.Invoke(SciencePoint, PhysicalPoint);
-    }
     public static void OnBuildingSelected(ref SchoolPoints schoolPoints)
     {
-        BuildingPointsSelected?.Invoke(schoolPoints);
+        BuildingSelected?.Invoke(ref schoolPoints);
     }
     
     
