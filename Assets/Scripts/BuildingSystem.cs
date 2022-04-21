@@ -4,6 +4,7 @@ using UnityEngine.Tilemaps;
 
 public class BuildingSystem : MonoBehaviour
 {
+    private Vector3[] _directionForBuilding = {Vector3.forward,Vector3.right, Vector3.back, Vector3.left, Vector3.up};
     public static BuildingSystem Current;
 
     [SerializeField] GameObject _mainPrefab;
@@ -13,12 +14,13 @@ public class BuildingSystem : MonoBehaviour
     Grid _grid;
 
     public GameObject CurrentPrefab;
-    public Building CurrentBuilding;
+    private Building _currentBuilding;
     
     private PlacebleObject _objToPlace;
      
     private Vector3 _falseVector = new Vector3(0,-1,0);
     private List<Placement> _currentPlacements = new List<Placement>();
+    private bool _isHaveUpDirection = false;
     [SerializeField] TileBase whiteTile;
     [SerializeField] GameObject _placement;
     
@@ -56,12 +58,13 @@ public class BuildingSystem : MonoBehaviour
 
     public void InizialateGameObject(GameObject prefab, Vector3 spawnPos, byte idFloor)
     {
-        Vector3 position = SnapGridPosition(spawnPos) + GetOffsetFloor(idFloor);
+        Vector3 position = GetOffsetToPos(spawnPos, idFloor);
         
         GameObject obj = Instantiate(prefab, position, Quaternion.identity);
         obj.GetComponent<Building>().IdFloor = idFloor;
         
         var curTilemap = _tilemapsFloors[idFloor];
+        Debug.Log("CURTILEMAP ID FLOOR " + idFloor);
         curTilemap.SetTile(curTilemap.WorldToCell(spawnPos), whiteTile);
         
         
@@ -73,98 +76,114 @@ public class BuildingSystem : MonoBehaviour
             EventManager.OnBuidingCreated(ref schoolPoints);
         }
         
-
         ClearPlacement();
     }
     
-    public void InitializePlacements(Vector3 position, Building building)
+    public void InitializePlacements(Building building)
     {
         ClearPlacement();
         SetCurrentBuilding(building);
-        CreatePlacements(GetPositionsForPlacement(position, building.IdFloor));
+
+        Vector3[] positions = GetPositionsForPlacement(_currentBuilding);
+        
+        CreatePlacements(positions, _currentBuilding.IdFloor);
     }
     
-    private void InizialatePlacement(Vector3 pos, bool isNextLevel)
+    private Vector3[] GetPositionsForPlacement(Building building)
     {
-        var currentIdDFloor = CurrentBuilding.IdFloor;
-        if (isNextLevel)
+        var permission = building.GetPermissionForBuilding();
+        byte sizeCanTile = (byte)permission.Length;
+        List<Vector3> positions = new List<Vector3>();
+        
+        for (int i = 0; i < sizeCanTile; i++)
         {
-            if (currentIdDFloor + 1 < _tilemapsFloors.Length)
-                currentIdDFloor++;
-        }
+            var position = GetPositionForPlacement(building.transform.position, _directionForBuilding[i]);
+            Vector3Int otherCellPos = _tilemapsFloors[building.IdFloor].WorldToCell(position);
 
-        Vector3 position = SnapGridPosition(pos) + GetOffsetFloor(currentIdDFloor);
+            if (i != sizeCanTile - 1) //Последний элемент это вектор вверх, поэтому делается проверка
+            {
+                if(!IsBuildForPlacement(otherCellPos, building.IdFloor))
+                    continue;
+            }
+            else
+            {
+                if (IsBuildForUpPlacement(otherCellPos, building.IdFloor))
+                {
+                    _isHaveUpDirection = true;  
+                    Debug.Log("_isHaveUpDirection TRUE");
+                }   
+            }
+
+            positions.Add(position);
+        }
+        
+        return positions.ToArray();
+    }
+
+    private bool IsBuildForUpPlacement(Vector3Int pos, byte idFloor)
+    {
+        byte nextIdFloor = idFloor + 1 < _tilemapsFloors.Length ? ++idFloor : idFloor ;
+        Debug.Log("NextIdFloor " + nextIdFloor);
+        return !IsHaveBuilding(pos, nextIdFloor);
+    }
+    private bool IsBuildForPlacement(Vector3Int position, byte idFloor)
+    {
+        if (idFloor - 1 >= 0)                                                                                           
+        {
+            byte idFloorUnderBuilding = (byte) (idFloor - 1);
+            if (!IsNineBuildingsUnderPlacement(position, idFloorUnderBuilding))                                         //Проверка на наличие зданий
+                                                                                                                        //в 9 клетках под выбранным
+            {
+                return false;
+            }
+        }
+        
+        if (IsHaveBuilding(position, idFloor))                                                                          //Проверка на наличие другого здания
+            return false;
+
+        return true; 
+    }
+
+    private void InizialatePlacement(Vector3 pos, byte idFloor)
+    {
+        Vector3 position = GetOffsetToPos(pos,idFloor);
         
         GameObject obj = Instantiate(_placement, position, Quaternion.identity);
-        obj.GetComponent<Placement>().IdFloor = currentIdDFloor;
-        
-        _currentPlacements.Add(obj.GetComponent<Placement>());
+        Placement placement = obj.GetComponent<Placement>();
+        placement.IdFloor = idFloor;
+
+        _currentPlacements.Add(placement);
     }
+
+    private Vector3 GetOffsetToPos(Vector3 pos, byte currentIdDFloor) => SnapGridPosition(pos) + GetOffsetFloor(currentIdDFloor);
 
     #endregion
 
     #region Placement
 
-    private void CreatePlacements(Vector3[] positions)
+    private void CreatePlacements(Vector3[] positions, byte idFloor)
     {
-        var lastIdVec = positions.Length - 1;
-        bool isNextLevel = false;
-        for (var index = 0; index <= lastIdVec; index++)
+        var lastIndex = positions.Length - 1;
+        for (var index = 0; index <= lastIndex; index++)
         {
             var pos = positions[index];
-
-            if (pos == _falseVector)
-                continue;
-
-            if (index == lastIdVec)
-                isNextLevel = true;
-
-            InizialatePlacement(pos, isNextLevel);
+            if (index == lastIndex && _isHaveUpDirection)
+            {
+                idFloor++;
+                Debug.Log("idFloor: " + idFloor);
+            }
+            
+            InizialatePlacement(pos, idFloor);
         }
     }
-    
-    private Vector3[] GetPositionsForPlacement(Vector3 pos, byte idFloor)
-    {
-        byte sizeCanTile = 5;
 
-        Vector3[] array = new Vector3[sizeCanTile];
-        array[0] = CheckPositionForPlacement(pos, Vector3.forward, idFloor);
-        array[1] = CheckPositionForPlacement(pos, Vector3.right, idFloor);
-        array[2] = CheckPositionForPlacement(pos, Vector3.back, idFloor);
-        array[3] = CheckPositionForPlacement(pos, Vector3.left, idFloor);
-        array[4] = CheckPositionForPlacement(pos, Vector3.zero, idFloor);
-        
-        return array;
-    }
-
-    private Vector3 CheckPositionForPlacement(Vector3 pos, Vector3 offsetVector, byte idFloor)
+    private Vector3 GetPositionForPlacement(Vector3 pos, Vector3 offsetVector)
     { 
         Vector3 otherTilePos = pos + offsetVector;
-        Vector3Int otherCellPos = _tilemapsFloors[idFloor].WorldToCell(otherTilePos);
-        //Проеврка на наличие здание под выбранным
-        
-        if (idFloor - 1 >= 0)
-        {
-            byte idFloorUnderBuilding = (byte) (idFloor - 1);
-            if (!IsHaveBuildingUnderPlacement(otherCellPos, idFloorUnderBuilding))
-            {
-                return _falseVector;
-            }
-                
-        }
-
-        //Проверка на этаже выше
-        if (offsetVector == Vector3.zero && idFloor + 1 < _tilemapsFloors.Length)
-            idFloor++;
-        
-        //Проверка на наличие другого здания
-        if (IsHaveBuilding(otherCellPos, idFloor))
-            return _falseVector;
-
         return otherTilePos;
     }
-
-    private bool IsHaveBuildingUnderPlacement(Vector3Int otherCellPos, byte idUnderFloor)
+    
+    private bool IsNineBuildingsUnderPlacement(Vector3Int otherCellPos, byte idUnderFloor)
     {
         for (int x = -1; x <= 1; x++)
         {
@@ -181,13 +200,11 @@ public class BuildingSystem : MonoBehaviour
         return false;
     }
 
-    private bool IsHaveBuilding(Vector3Int pos, byte idFloor)
-    {
-        return _tilemapsFloors[idFloor].GetTile(pos) == whiteTile;
-    }
+    private bool IsHaveBuilding(Vector3Int pos, byte idFloor) => _tilemapsFloors[idFloor].GetTile(pos) == whiteTile;
 
     private void ClearPlacement()
     {
+        _isHaveUpDirection = false;
         foreach (var placement in _currentPlacements) Destroy(placement.gameObject);
         _currentPlacements.Clear();
     }
@@ -198,18 +215,15 @@ public class BuildingSystem : MonoBehaviour
     public void SetCurrentPrefab(GameObject value) => CurrentPrefab = value;
     public void ClearCurrentBuilding()
     {
-        if(CurrentBuilding)
-            DisactiveCurrentBuilding(CurrentBuilding);
-        CurrentBuilding = null;
+        if(_currentBuilding)
+            DisactiveCurrentBuilding(_currentBuilding);
+        _currentBuilding = null;
     }
     
     private void SetCurrentBuilding(Building building)
     {
-        if (CurrentBuilding)
-        {
-            DisactiveCurrentBuilding(CurrentBuilding);
-        }
-        CurrentBuilding = building;
+        if (_currentBuilding) DisactiveCurrentBuilding(_currentBuilding);
+        _currentBuilding = building;
     }
 
     private void DisactiveCurrentBuilding(Building building) => building.GetComponent<Renderer>().material.color = Color.white;

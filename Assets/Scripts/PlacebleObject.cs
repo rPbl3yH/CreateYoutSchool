@@ -7,7 +7,8 @@ public abstract class PlacebleObject : MonoBehaviour, IPointerClickHandler
 {
     
     [NonSerialized] public BuildingSystem BuildSystem;
-    [NonSerialized] public byte IdFloor;
+    public byte IdFloor;
+    
     [SerializeField] protected TileBase Tile;
     
     public virtual void Start()

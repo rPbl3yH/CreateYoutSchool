@@ -9,7 +9,7 @@ public class StandartPlacement : Placement
     {
         base.OnPointerClick(eventData);
         BuildSystem.ClearCurrentBuilding();
-        BuildSystem.InizialateGameObject(CurrentPrefab, gameObject.transform.position, IdFloor);
+        BuildSystem.InizialateGameObject(CurrentPrefab, transform.position, IdFloor);
         
         Destroy(gameObject);
     }

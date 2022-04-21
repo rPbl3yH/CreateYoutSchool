@@ -31,14 +31,13 @@ public class PointsData : MonoBehaviour
         {
             _schoolPoints.Points[pair.Key] += pair.Value;
         }
-
+        
         _pointsBarController.SetPoints(ref _schoolPoints);
         _pointsBarController.SetActiveCurrentTexts(false);
     }
     
     public void OnBuildingSelected(ref SchoolPoints schoolPoints)
     {
-        Debug.Log(schoolPoints.Points);
         foreach (var pair in schoolPoints.Points)
         {
             _currentSchoolPoints.Points[pair.Key] = pair.Value;
