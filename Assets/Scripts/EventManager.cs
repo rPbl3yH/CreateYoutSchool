@@ -8,7 +8,7 @@ public class EventManager : MonoBehaviour
     public delegate void BuildingDelegateSelected(ref SchoolPoints schoolPoints);
     public delegate void BuildingDelegateCreated(ref SchoolPoints schoolPoints);
     
-    public static void OnBuidingCreated(ref SchoolPoints schoolPoints)
+    public static void OnBuildingCreated(ref SchoolPoints schoolPoints)
     {
         BuildingCreated?.Invoke(ref schoolPoints);
     }

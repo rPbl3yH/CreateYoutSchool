@@ -18,7 +18,6 @@ public class BuildingSystem : MonoBehaviour
     
     private PlacebleObject _objToPlace;
      
-    private Vector3 _falseVector = new Vector3(0,-1,0);
     private List<Placement> _currentPlacements = new List<Placement>();
     private bool _isHaveUpDirection = false;
     [SerializeField] TileBase whiteTile;
@@ -35,14 +34,14 @@ public class BuildingSystem : MonoBehaviour
 
     private void Start()
     {
-        Instantiate(_placement, transform.position, Quaternion.identity);
+        Instantiate(_placement, _grid.GetCellCenterWorld(Gridlayout.WorldToCell(transform.position)) , Quaternion.identity);
     }
 
     #endregion
 
     #region Utils
 
-    private Vector3 SnapGridPosition(Vector3 worldPosition)
+    private Vector3 SnapGridPosition(Vector3 worldPosition, byte idFloor)
     {
         Vector3Int cellPos = Gridlayout.WorldToCell(worldPosition);
         worldPosition = _grid.GetCellCenterWorld(cellPos);
@@ -60,21 +59,18 @@ public class BuildingSystem : MonoBehaviour
     public void InizialateGameObject(GameObject prefab, Vector3 spawnPos, byte idFloor)
     {
         Vector3 position = GetOffsetToPos(spawnPos, idFloor);
-        
         GameObject obj = Instantiate(prefab, position, Quaternion.identity);
         obj.GetComponent<Building>().IdFloor = idFloor;
         
         var curTilemap = _tilemapsFloors[idFloor];
-        Debug.Log("CURTILEMAP ID FLOOR " + idFloor);
         curTilemap.SetTile(curTilemap.WorldToCell(spawnPos), whiteTile);
-        
-        
+
         if (obj.TryGetComponent(out SchoolBuilding schoolBuilding))
         {
             SchoolPoints schoolPoints = new SchoolPoints();
             schoolPoints.Initialize(0,10);
             schoolBuilding.Initialize(ref schoolPoints);
-            EventManager.OnBuidingCreated(ref schoolPoints);
+            EventManager.OnBuildingCreated(ref schoolPoints);
         }
         
         ClearPlacement();
@@ -108,11 +104,9 @@ public class BuildingSystem : MonoBehaviour
             }
             else
             {
-                if (IsBuildForUpPlacement(otherCellPos, building.IdFloor))
-                {
-                    _isHaveUpDirection = true;  
-                    Debug.Log("_isHaveUpDirection TRUE");
-                }   
+                if (!IsBuildForUpPlacement(otherCellPos, building.IdFloor))
+                    continue;
+                _isHaveUpDirection = true;  
             }
 
             positions.Add(position);
@@ -124,22 +118,18 @@ public class BuildingSystem : MonoBehaviour
     private bool IsBuildForUpPlacement(Vector3Int pos, byte idFloor)
     {
         byte nextIdFloor = idFloor + 1 < _tilemapsFloors.Length ? ++idFloor : idFloor ;
-        Debug.Log("NextIdFloor " + nextIdFloor);
         return !IsHaveBuilding(pos, nextIdFloor);
     }
     private bool IsBuildForPlacement(Vector3Int position, byte idFloor)
     {
-        if (idFloor - 1 >= 0)                                                                                           
+        if (idFloor - 1 >= 0)
         {
-            byte idFloorUnderBuilding = (byte) (idFloor - 1);
-            if (!IsNineBuildingsUnderPlacement(position, idFloorUnderBuilding))                                         //Проверка на наличие зданий
-                                                                                                                        //в 9 клетках под выбранным
-            {
+            byte underIdFloor = (byte)(idFloor - 1);
+            if (!IsNineBuildingsUnderPlacement(position, underIdFloor))//Проверка на наличие зданий в 9 клетках под выбранным             
                 return false;
-            }
         }
-        
-        if (IsHaveBuilding(position, idFloor))                                                                          //Проверка на наличие другого здания
+
+        if (IsHaveBuilding(position, idFloor)) //Проверка на наличие другого здания
             return false;
 
         return true; 
@@ -156,7 +146,10 @@ public class BuildingSystem : MonoBehaviour
         _currentPlacements.Add(placement);
     }
 
-    private Vector3 GetOffsetToPos(Vector3 pos, byte currentIdDFloor) => SnapGridPosition(pos) + GetOffsetFloor(currentIdDFloor);
+    private Vector3 GetOffsetToPos(Vector3 pos, byte currentIdDFloor)
+    {
+        return SnapGridPosition(pos, currentIdDFloor) + GetOffsetFloor(currentIdDFloor);
+    }
 
     #endregion
 
@@ -171,7 +164,6 @@ public class BuildingSystem : MonoBehaviour
             if (index == lastIndex && _isHaveUpDirection)
             {
                 idFloor++;
-                Debug.Log("idFloor: " + idFloor);
             }
             
             InizialatePlacement(pos, idFloor);
@@ -214,6 +206,7 @@ public class BuildingSystem : MonoBehaviour
     
     #region Select Building
     public void SetCurrentPrefab(GameObject value) => CurrentPrefab = value;
+    
     public void ClearCurrentBuilding()
     {
         if(_currentBuilding)
@@ -231,7 +224,4 @@ public class BuildingSystem : MonoBehaviour
 
     #endregion
     #endregion
-
-    
-
 }

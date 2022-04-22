@@ -16,7 +16,6 @@ public struct SchoolPoints
         {
             Points.Add(point, Random.Range(minValue,maxValue));
         }
-        PrintInfo();
     }
 
     public void Initialize()
@@ -27,7 +26,6 @@ public struct SchoolPoints
         {
             Points.Add(point, 0);
         }
-        PrintInfo();
     }
 
     #endregion
@@ -35,8 +33,8 @@ public struct SchoolPoints
     #region Info
     public void PrintInfo()
     {
-        Debug.Log($"Science: {Points[TypePoints.Science]} Physical: " +
-                  $"{Points[TypePoints.Physical]} " +
+        Debug.Log($"Science: {Points[TypePoints.Science]} " +
+                  $"Physical: {Points[TypePoints.Physical]} " +
                   $"Musical: {Points[TypePoints.Musical]}");
     }
     #endregion
