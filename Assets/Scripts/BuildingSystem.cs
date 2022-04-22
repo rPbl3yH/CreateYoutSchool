@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
@@ -6,8 +5,8 @@ using UnityEngine.Tilemaps;
 public class BuildingSystem : MonoBehaviour
 {
     private readonly Vector3[] _directionForBuilding = {Vector3.forward,Vector3.right, Vector3.back, Vector3.left, Vector3.up};
-    public static BuildingSystem Current;
-    
+    public static BuildingSystem Current { get; private set; }
+
     [Header("Building On Start")]
     [SerializeField] GameObject _startPrefab;
     [Header("Placement")]
@@ -23,7 +22,7 @@ public class BuildingSystem : MonoBehaviour
     [Header("Particles")]
     [SerializeField] private ParticleSystem _particleAfterBuilt;
     
-    [HideInInspector] public GameObject CurrentPrefab;
+    public GameObject CurrentPrefab { get; private set; }
     
     private Grid _grid;
     private Building _currentBuilding;
