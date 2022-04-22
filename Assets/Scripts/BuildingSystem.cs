@@ -22,6 +22,8 @@ public class BuildingSystem : MonoBehaviour
     private bool _isHaveUpDirection = false;
     [SerializeField] TileBase whiteTile;
     [SerializeField] GameObject _placement;
+    [SerializeField] private ParticleSystem _particleSystem;
+    private ParticleSystem _currentParticle;
     
     #region UnityMethods
 
@@ -72,9 +74,22 @@ public class BuildingSystem : MonoBehaviour
             schoolBuilding.Initialize(ref schoolPoints);
             EventManager.OnBuildingCreated(ref schoolPoints);
         }
+
+        Vector3 spawnPosParticle = new Vector3(position.x,position.y - obj.transform.localScale.y / 2,position.z);
+        CreateParticle(spawnPosParticle);
         
         ClearPlacement();
     }
+
+    #region Paticle
+
+    private void CreateParticle(Vector3 pos)
+    {
+        _particleSystem.transform.position = pos;
+        _particleSystem.Play();
+    }
+
+    #endregion
     
     public void InitializePlacements(Building building)
     {
