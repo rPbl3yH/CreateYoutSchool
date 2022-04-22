@@ -41,18 +41,7 @@ public class BuildingSystem : MonoBehaviour
     #endregion
 
     #region Utils
-<<<<<<< HEAD
-=======
 
-    public void SetCurrentPrefab(GameObject value) => CurrentPrefab = value;
-
-    public void InitializePlacements(Vector3 position, Building building)
-    {
-        ClearPlacement();
-        SetCurrentBuilding(building);
-        CreatePlacements(GetPositionsForPlacement(position, building.IdFloor));
-    }
->>>>>>> 5ddbe4f9d37f6833610771b7c9d4cf6dd6461de6
     private Vector3 SnapGridPosition(Vector3 worldPosition)
     {
         Vector3Int cellPos = Gridlayout.WorldToCell(worldPosition);
