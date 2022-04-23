@@ -8,6 +8,8 @@ public class PointsBarController : MonoBehaviour
     [SerializeField] private Text[] _currentTextPoins;
     
     [SerializeField] private string _template;
+
+    [SerializeField] private Button _deleteCurrentButton;
     
     #region UnityMethods
     
@@ -34,6 +36,15 @@ public class PointsBarController : MonoBehaviour
     }
 
     #endregion
+
+
+    public void SetActiveAllCurrentElements(bool isActive)
+    {
+        _deleteCurrentButton.gameObject.SetActive(isActive);
+        SetActiveCurrentTexts(isActive);
+    }
+    
+    
 
     #region Texts
 

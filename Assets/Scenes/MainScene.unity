@@ -332,11 +332,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 236268881}
   m_CullTransparentMesh: 1
---- !u!198 &432472208 stripped
-ParticleSystem:
-  m_CorrespondingSourceObject: {fileID: 4579147889666994589, guid: a0822ac7a7f294558a6d2eea30ac2a3d, type: 3}
-  m_PrefabInstance: {fileID: 2096638863}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &524690816
 GameObject:
   m_ObjectHideFlags: 0
@@ -2029,16 +2024,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4ca57bcb2c23544ec819350bc56ac917, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _mainPrefab: {fileID: 4554736530624499143, guid: 3c64b37df55b44ec2bdab032e392f252, type: 3}
+  _startPrefab: {fileID: 4554736530624499143, guid: 3c64b37df55b44ec2bdab032e392f252, type: 3}
+  _placementPrefab: {fileID: 5304972868329386262, guid: 5600303925dbd4f1388e054f49a13fc6, type: 3}
   _tilemapsFloors:
   - {fileID: 954746491}
   - {fileID: 1552422042}
   - {fileID: 1622531781}
-  Gridlayout: {fileID: 1528099173}
-  CurrentPrefab: {fileID: 0}
-  whiteTile: {fileID: 11400000, guid: ab9b464992e12484b871d4b0c3a7c77a, type: 2}
-  _placement: {fileID: 5304972868329386262, guid: 5600303925dbd4f1388e054f49a13fc6, type: 3}
-  _particleSystem: {fileID: 432472208}
+  _gridlayout: {fileID: 1528099173}
+  _buildingTile: {fileID: 11400000, guid: ab9b464992e12484b871d4b0c3a7c77a, type: 2}
+  _particleAfterBuilt: {fileID: 4579147889666994589, guid: a0822ac7a7f294558a6d2eea30ac2a3d, type: 3}
 --- !u!156049354 &1528099173
 Grid:
   m_ObjectHideFlags: 0

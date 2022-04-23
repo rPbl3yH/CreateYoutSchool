@@ -199,6 +199,15 @@ public class BuildingSystem : MonoBehaviour
 
     #endregion
 
+    #region Delete
+
+    public void DeleteCurrentObj()
+    {
+        Destroy(_currentBuilding.gameObject);
+    }
+
+    #endregion
+    
     #region Placement
 
     private void CreatePlacements(Vector3[] positions, byte idFloor)

@@ -9,7 +9,7 @@ public enum TypePoints
 }
 public class PointsData : MonoBehaviour
 {
-    [SerializeField] PointsBarController _pointsBarController;
+    [SerializeField] private PointsBarController _pointsBarController;
 
     private Dictionary<TypePoints, int> dicPoints;
     
@@ -24,8 +24,8 @@ public class PointsData : MonoBehaviour
         EventManager.BuildingCreated += OnBuildingCreated;
         EventManager.BuildingSelected += OnBuildingSelected;
     }
-    
-    public void OnBuildingCreated(ref SchoolPoints schoolPoints)
+
+    private void OnBuildingCreated(ref SchoolPoints schoolPoints)
     {
         foreach (var pair in schoolPoints.Points)
         {
@@ -33,17 +33,17 @@ public class PointsData : MonoBehaviour
         }
         
         _pointsBarController.SetPoints(ref _schoolPoints);
-        _pointsBarController.SetActiveCurrentTexts(false);
+        _pointsBarController.SetActiveAllCurrentElements(false);
     }
-    
-    public void OnBuildingSelected(ref SchoolPoints schoolPoints)
+
+    private void OnBuildingSelected(ref SchoolPoints schoolPoints)
     {
         foreach (var pair in schoolPoints.Points)
         {
             _currentSchoolPoints.Points[pair.Key] = pair.Value;
         }
         
-        _pointsBarController.SetActiveCurrentTexts(true);
+        _pointsBarController.SetActiveAllCurrentElements(true);
         _pointsBarController.SetCurrentPoints(ref _currentSchoolPoints);
     }
     

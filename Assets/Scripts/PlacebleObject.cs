@@ -5,11 +5,10 @@ using UnityEngine.Tilemaps;
 
 public abstract class PlacebleObject : MonoBehaviour, IPointerClickHandler
 {
-    
-    [NonSerialized] public BuildingSystem BuildSystem;
+    protected BuildingSystem BuildSystem { get; private set; }
     public byte IdFloor;
     
-    [SerializeField] protected TileBase Tile;
+    [SerializeField] protected TileBase Tile; //Тайлы будут использоваться для опознавания здания
     
     public virtual void Start()
     {
