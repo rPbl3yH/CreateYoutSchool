@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
-public struct SchoolPoints
+public struct SchoolPointsData
 {
     public Dictionary<TypePoints, int> Points;
 

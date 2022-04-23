@@ -30,6 +30,7 @@ public class BuildingSystem : MonoBehaviour
     private List<Placement> _currentPlacements = new List<Placement>();
     private bool _isHaveUpDirection = false;
     private ParticleSystem _currentParticle;
+    private ushort _countBuilding;
     
     #region UnityMethods
 
@@ -69,6 +70,7 @@ public class BuildingSystem : MonoBehaviour
     {
         Vector3 position = GetOffsetToPos(spawnPos, idFloor);
         GameObject obj = CreateAndGetBuilding(prefab,position);
+        _countBuilding++;
         
         InitializeIdFloorOfBuilding(obj, idFloor);
         
@@ -79,7 +81,7 @@ public class BuildingSystem : MonoBehaviour
         Vector3 spawnPosParticle = new Vector3(position.x,position.y - obj.transform.localScale.y / 2,position.z);
         CreateParticle(spawnPosParticle);
         
-        ClearPlacement();
+        ClearAllPlacements();
     }
 
     private GameObject CreateAndGetBuilding(GameObject prefab, Vector3 position)
@@ -102,11 +104,18 @@ public class BuildingSystem : MonoBehaviour
         curTilemap.SetTile(curTilemap.WorldToCell(pos), _buildingTile);
     }
 
+    private void InitializeNoneTile(Vector3 pos, byte idFloor)
+    {
+        var curTilemap = _tilemapsFloors[idFloor];
+        var currentCellPos = curTilemap.WorldToCell(pos);
+        curTilemap.SetTile(currentCellPos, null);
+    }
+
     private void InitializeSchoolPoints(GameObject obj)
     {
         if (!obj.TryGetComponent(out SchoolBuilding schoolBuilding)) return;
         
-        SchoolPoints schoolPoints = new SchoolPoints();
+        SchoolPointsData schoolPoints = new SchoolPointsData();
         schoolPoints.Initialize(0,10);
         schoolBuilding.Initialize(ref schoolPoints);
         EventManager.OnBuildingCreated(ref schoolPoints);
@@ -124,7 +133,7 @@ public class BuildingSystem : MonoBehaviour
     
     public void InitializePlacements(Building building)
     {
-        ClearPlacement();
+        ClearAllPlacements();
         SetCurrentBuilding(building);
 
         Vector3[] positions = GetPositionsForPlacements(_currentBuilding);
@@ -203,6 +212,19 @@ public class BuildingSystem : MonoBehaviour
 
     public void DeleteCurrentObj()
     {
+        _countBuilding--;
+        ClearAllPlacements();
+        
+        var schoolPoints = _currentBuilding.GetComponent<SchoolBuilding>().SchoolPoints;
+        EventManager.OnBuildingDeleted(ref schoolPoints);
+
+        if (_countBuilding == 0)
+        {
+            InitializePlacement(_tilemapsFloors[0].GetCellCenterWorld(Vector3Int.zero), _currentBuilding.IdFloor);
+        }
+
+        InitializeNoneTile(_currentBuilding.transform.position, _currentBuilding.IdFloor);
+
         Destroy(_currentBuilding.gameObject);
     }
 
@@ -250,7 +272,7 @@ public class BuildingSystem : MonoBehaviour
 
     private bool IsHaveBuilding(Vector3Int pos, byte idFloor) => _tilemapsFloors[idFloor].GetTile(pos) == _buildingTile;
 
-    private void ClearPlacement()
+    private void ClearAllPlacements()
     {
         _isHaveUpDirection = false;
         foreach (var placement in _currentPlacements) Destroy(placement.gameObject);

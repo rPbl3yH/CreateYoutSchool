@@ -17,7 +17,7 @@ public class PointsBarController : MonoBehaviour
 
     #region SetValues
 
-    public void SetPoints(ref SchoolPoints schoolPoints)
+    public void SetPoints(ref SchoolPointsData schoolPoints)
     {
         if (schoolPoints.Points.Count > _textPoins.Length)
             throw new ArgumentException("Типов поинтов больше, чем текстов");
@@ -26,7 +26,7 @@ public class PointsBarController : MonoBehaviour
             _textPoins[(int) pair.Key].text = string.Format(_template, pair.Key, pair.Value);
     }
     
-    public void SetCurrentPoints(ref SchoolPoints schoolPoints)
+    public void SetCurrentPoints(ref SchoolPointsData schoolPoints)
     {
         if (schoolPoints.Points.Count > _textPoins.Length)
             throw new ArgumentException("Типов поинтов больше, чем текущих текстов");

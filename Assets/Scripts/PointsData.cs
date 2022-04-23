@@ -13,8 +13,8 @@ public class PointsData : MonoBehaviour
 
     private Dictionary<TypePoints, int> dicPoints;
     
-    private SchoolPoints _schoolPoints;
-    private SchoolPoints _currentSchoolPoints;
+    private SchoolPointsData _schoolPoints;
+    private SchoolPointsData _currentSchoolPoints;
 
     private void Start()
     {
@@ -23,9 +23,10 @@ public class PointsData : MonoBehaviour
         
         EventManager.BuildingCreated += OnBuildingCreated;
         EventManager.BuildingSelected += OnBuildingSelected;
+        EventManager.BuildingDeleted += OnBuildingDeleted;
     }
 
-    private void OnBuildingCreated(ref SchoolPoints schoolPoints)
+    private void OnBuildingCreated(ref SchoolPointsData schoolPoints)
     {
         foreach (var pair in schoolPoints.Points)
         {
@@ -36,7 +37,7 @@ public class PointsData : MonoBehaviour
         _pointsBarController.SetActiveAllCurrentElements(false);
     }
 
-    private void OnBuildingSelected(ref SchoolPoints schoolPoints)
+    private void OnBuildingSelected(ref SchoolPointsData schoolPoints)
     {
         foreach (var pair in schoolPoints.Points)
         {
@@ -45,6 +46,17 @@ public class PointsData : MonoBehaviour
         
         _pointsBarController.SetActiveAllCurrentElements(true);
         _pointsBarController.SetCurrentPoints(ref _currentSchoolPoints);
+    }
+
+    private void OnBuildingDeleted(ref SchoolPointsData schoolPoints)
+    {
+        foreach (var pair in schoolPoints.Points)
+        {
+            _schoolPoints.Points[pair.Key] -= pair.Value;
+        }
+        
+        _pointsBarController.SetPoints(ref _schoolPoints);
+        _pointsBarController.SetActiveAllCurrentElements(false);
     }
     
     

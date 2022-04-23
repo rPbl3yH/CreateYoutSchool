@@ -4,16 +4,17 @@ using UnityEngine.EventSystems;
 
 public class SchoolBuilding : Building
 {
-    private SchoolPoints _schoolPoints;
-    
-    public void Initialize(ref SchoolPoints schoolPoints)
+    public SchoolPointsData SchoolPoints { get; private set; }
+
+    public void Initialize(ref SchoolPointsData schoolPoints)
     {
-        _schoolPoints = schoolPoints;
+        SchoolPoints = schoolPoints;
     }
 
     public override void OnPointerClick(PointerEventData eventData)
     {
         base.OnPointerClick(eventData);
-        EventManager.OnBuildingSelected(ref _schoolPoints);
+        var schoolPoints = SchoolPoints;
+        EventManager.OnBuildingSelected(ref schoolPoints);
     }
 }
