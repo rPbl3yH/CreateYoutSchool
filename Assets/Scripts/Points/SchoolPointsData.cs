@@ -6,7 +6,7 @@ using Random = UnityEngine.Random;
 public struct SchoolPointsData
 {
     public Dictionary<TypePoints, int> Points;
-
+    
     #region Initializing
     public void Initialize(int minValue, int maxValue)
     {
@@ -25,6 +25,19 @@ public struct SchoolPointsData
         foreach (TypePoints point in typePoints)
         {
             Points.Add(point, 0);
+        }
+    }
+    
+    public void Initialize(int[] points)
+    {
+        Points = new Dictionary<TypePoints, int>();
+        var typePoints = Enum.GetValues(typeof(TypePoints));
+        
+        if (points.Length != typePoints.Length) Debug.Log("Values of length are not equal");
+        
+        for (int index = 0; index < typePoints.Length; index++)
+        {
+            Points.Add((TypePoints) typePoints.GetValue(index), points[index]);
         }
     }
 

@@ -1,10 +1,10 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
 public class BuildingSystem : MonoBehaviour
-{
-    private readonly Vector3[] _directionForBuilding = {Vector3.forward,Vector3.right, Vector3.back, Vector3.left, Vector3.up};
+{ 
     public static BuildingSystem Current { get; private set; }
 
     [Header("Building On Start")]
@@ -21,17 +21,24 @@ public class BuildingSystem : MonoBehaviour
     
     [Header("Particles")]
     [SerializeField] private ParticleSystem _particleAfterBuilt;
+
+    [Header("Loading and Saving")]
+    [SerializeField] private LoadSaveDataSystem _loadSaveDataSystem;
     
     public GameObject CurrentPrefab { get; private set; }
-    
+    public GameObject StartPrefab { get; private set; }
+
     private Grid _grid;
     private Building _currentBuilding;
     private PlacebleObject _objToPlace;
     private List<Placement> _currentPlacements = new List<Placement>();
     private bool _isHaveUpDirection = false;
     private ParticleSystem _currentParticle;
-    private ushort _countBuilding;
+    public ushort CountBuilding { get; private set; }
+    private readonly Vector3[] _directionForBuilding = {Vector3.forward,Vector3.right, Vector3.back, Vector3.left, Vector3.up};
+
     
+
     #region UnityMethods
 
     private void Awake()
@@ -60,6 +67,10 @@ public class BuildingSystem : MonoBehaviour
 
     private Vector3 GetOffsetFloor(byte idFloor) => new Vector3(0, 0.6f, 0) * idFloor; //Пока здесь просто какой-то вектор. Я изменю его на другой)
 
+    private Vector3 GetOffsetToPos(Vector3 pos, byte currentIdDFloor)
+    {
+        return SnapGridPosition(pos, currentIdDFloor) + GetOffsetFloor(currentIdDFloor);
+    }
     #endregion
 
     #region Building System
@@ -70,7 +81,7 @@ public class BuildingSystem : MonoBehaviour
     {
         Vector3 position = GetOffsetToPos(spawnPos, idFloor);
         GameObject obj = CreateAndGetBuilding(prefab,position);
-        _countBuilding++;
+        CountBuilding++;
         
         InitializeIdFloorOfBuilding(obj, idFloor);
         
@@ -82,6 +93,30 @@ public class BuildingSystem : MonoBehaviour
         CreateParticle(spawnPosParticle);
         
         ClearAllPlacements();
+        
+        if(CountBuilding % 5 == 0)
+            _loadSaveDataSystem.SaveData();
+    }
+    
+    public void InitializeGameObject(GameObject prefab, Vector3 spawnPos, byte idFloor, int[] points)
+    {
+        Vector3 position = GetOffsetToPos(spawnPos, idFloor);
+        GameObject obj = CreateAndGetBuilding(prefab,position);
+        CountBuilding++;
+        
+        InitializeIdFloorOfBuilding(obj, idFloor);
+        
+        InitializeTileOfBuilding(spawnPos, idFloor);
+
+        InitializeSchoolPoints(obj, points);
+
+        Vector3 spawnPosParticle = new Vector3(position.x,position.y - obj.transform.localScale.y / 2,position.z);
+        CreateParticle(spawnPosParticle);
+        
+        ClearAllPlacements();
+        
+        if(CountBuilding % 5 == 0)
+            _loadSaveDataSystem.SaveData();
     }
 
     private GameObject CreateAndGetBuilding(GameObject prefab, Vector3 position)
@@ -104,12 +139,18 @@ public class BuildingSystem : MonoBehaviour
         curTilemap.SetTile(curTilemap.WorldToCell(pos), _buildingTile);
     }
 
+    #region Tile
+
     private void InitializeNoneTile(Vector3 pos, byte idFloor)
     {
         var curTilemap = _tilemapsFloors[idFloor];
         var currentCellPos = curTilemap.WorldToCell(pos);
         curTilemap.SetTile(currentCellPos, null);
     }
+
+    #endregion
+
+    #region Points
 
     private void InitializeSchoolPoints(GameObject obj)
     {
@@ -120,6 +161,17 @@ public class BuildingSystem : MonoBehaviour
         schoolBuilding.Initialize(ref schoolPoints);
         EventManager.OnBuildingCreated(ref schoolPoints);
     }
+    private void InitializeSchoolPoints(GameObject obj, int[] points)
+    {
+        if (!obj.TryGetComponent(out SchoolBuilding schoolBuilding)) return;
+        
+        SchoolPointsData schoolPoints = new SchoolPointsData();
+        schoolPoints.Initialize(points);
+        schoolBuilding.Initialize(ref schoolPoints);
+        EventManager.OnBuildingCreated(ref schoolPoints);
+    }
+
+    #endregion
 
     #region Particle
 
@@ -130,7 +182,9 @@ public class BuildingSystem : MonoBehaviour
     }
 
     #endregion
-    
+
+    #region Placements
+
     public void InitializePlacements(Building building)
     {
         ClearAllPlacements();
@@ -201,10 +255,8 @@ public class BuildingSystem : MonoBehaviour
         _currentPlacements.Add(placement);
     }
 
-    private Vector3 GetOffsetToPos(Vector3 pos, byte currentIdDFloor)
-    {
-        return SnapGridPosition(pos, currentIdDFloor) + GetOffsetFloor(currentIdDFloor);
-    }
+    #endregion
+    
 
     #endregion
 
@@ -212,13 +264,13 @@ public class BuildingSystem : MonoBehaviour
 
     public void DeleteCurrentObj()
     {
-        _countBuilding--;
+        CountBuilding--;
         ClearAllPlacements();
         
         var schoolPoints = _currentBuilding.GetComponent<SchoolBuilding>().SchoolPoints;
         EventManager.OnBuildingDeleted(ref schoolPoints);
 
-        if (_countBuilding == 0)
+        if (CountBuilding == 0)
         {
             InitializePlacement(_tilemapsFloors[0].GetCellCenterWorld(Vector3Int.zero), _currentBuilding.IdFloor);
         }
