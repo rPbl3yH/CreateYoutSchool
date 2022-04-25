@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine;
 using Object = UnityEngine.Object;
 
 [System.Serializable]
@@ -43,11 +44,11 @@ public class DataSystem
             }
             if (schoolPoints.TryGetValue(TypePoints.Physical, out var physical))
             {
-                SciencePoints[index] = physical;
+                PhysicalPoints[index] = physical;
             }
             if (schoolPoints.TryGetValue(TypePoints.Musical, out var musical))
             {
-                SciencePoints[index] = musical;
+                MusicalPoints[index] = musical;
             }
         }
     }

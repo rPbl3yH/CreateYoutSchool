@@ -40,7 +40,7 @@ public class LoadSaveDataSystem : MonoBehaviour
             
             schoolPointsData.Initialize(points);
             
-            BuildingSystem.Current.InitializeGameObject(obj, spawnPos, idFloor);
+            BuildingSystem.Current.InitializeGameObject(obj, spawnPos, idFloor, points);
         }
     }
 
