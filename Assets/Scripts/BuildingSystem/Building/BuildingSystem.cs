@@ -275,7 +275,7 @@ public class BuildingSystem : MonoBehaviour
 
         if (CountBuilding == 0)
         {
-            InitializePlacement(_tilemapsFloors[0].GetCellCenterWorld(Vector3Int.zero), _currentBuilding.IdFloor);
+            InitializePlacement(_tilemapsFloors[0].GetCellCenterWorld(Vector3Int.zero), 0);
         }
 
         InitializeNoneTile(_currentBuilding.transform.position, _currentBuilding.IdFloor);
