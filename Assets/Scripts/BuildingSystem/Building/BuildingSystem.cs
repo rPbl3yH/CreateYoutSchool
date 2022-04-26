@@ -65,7 +65,7 @@ public class BuildingSystem : MonoBehaviour
         return worldPosition;
     }
 
-    private Vector3 GetOffsetFloor(byte idFloor) => new Vector3(0, 0.6f, 0) * idFloor; //Пока здесь просто какой-то вектор. Я изменю его на другой)
+    private Vector3 GetOffsetFloor(byte idFloor) => new Vector3(0, 0.4f, 0) * idFloor; //Пока здесь просто какой-то вектор. Я изменю его на другой)
 
     private Vector3 GetOffsetToPos(Vector3 pos, byte currentIdDFloor)
     {
@@ -203,6 +203,9 @@ public class BuildingSystem : MonoBehaviour
         
         for (int i = 0; i < sizeCanTile; i++)
         {
+            if(!permission[i])
+                continue;
+            
             var position = GetPositionForPlacement(building.transform.position, _directionForBuilding[i]);
             Vector3Int otherCellPos = _tilemapsFloors[building.IdFloor].WorldToCell(position);
 
@@ -349,7 +352,11 @@ public class BuildingSystem : MonoBehaviour
         _currentBuilding = building;
     }
 
-    private void DisactiveCurrentBuilding(Building building) => building.GetComponent<Renderer>().material.color = Color.white;
+    private void DisactiveCurrentBuilding(Building building)
+    {
+        //Здесь логика выделения объекта должна прописана быть
+        //building.GetComponent<Renderer>().material.color = Color.white;
+    } 
 
     #endregion
     #endregion

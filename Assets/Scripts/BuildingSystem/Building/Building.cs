@@ -12,7 +12,7 @@ public abstract class Building : PlacebleObject
     public override void OnPointerClick(PointerEventData eventData)
     {
         BuildSystem.InitializePlacements(this);
-        gameObject.GetComponent<Renderer>().material.color = Color.magenta;
+        //gameObject.GetComponent<Renderer>().material.color = Color.magenta;
     }
 
     public bool[] GetPermissionForBuilding()
